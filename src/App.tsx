@@ -23,9 +23,7 @@ class App extends Component {
               <Button>Overrides CSS</Button>
             </MuiThemeProvider>
           </div>
-
         </header>
-
       </div>
     );
   }
