@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import logo from '../../assets/logo.svg';
 import './App.css';
-import { theme } from './theme';
+import { theme } from '../../theme';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
