@@ -8,14 +8,10 @@ import Button from '@material-ui/core/Button';
 import Header from '../header/Header';
 
 class App extends Component {
-  constructor(props: any) {
-    super(props);
-  }
-
   render() {
     return (
       <MuiThemeProvider theme={theme}>
-        <Header />
+        <Header custom={42}/>
         <Button variant="contained" color="primary">Primary</Button>
         <Button variant="contained" color="secondary">Secondary</Button>
         <Button>Overrides CSS</Button>
