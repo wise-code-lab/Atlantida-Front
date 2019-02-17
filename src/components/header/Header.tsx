@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
+import Avatar from '@material-ui/core/Avatar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Badge from '@material-ui/core/Badge';
+import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles';
@@ -13,7 +15,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
-
+import {isNil as RIsNil} from 'ramda';
 const styles = (theme: Theme) =>
   createStyles({
     root: {
@@ -27,10 +29,13 @@ const styles = (theme: Theme) =>
       marginRight: 20,
     },
     title: {
-      display: 'none',
-      [theme.breakpoints.up('sm')]: {
-        display: 'block',
-      },
+      // display: 'none',
+      // [theme.breakpoints.up('sm')]: {
+      //   display: 'block',
+      // },
+    },
+    avatar: {
+      margin: 10,
     },
     inputRoot: {
       color: 'inherit',
@@ -62,7 +67,16 @@ const styles = (theme: Theme) =>
   });
 
 export interface Props extends WithStyles<typeof styles> {
-  custom: number
+  user: null | IUser
+}
+
+export interface IUser{
+  id: string,
+  name: string,
+  initials: string,
+  emailsCount: number,
+  notificationsCount: number,
+  imageBase64?: string
 }
 
 interface State {
@@ -95,10 +109,38 @@ class Header extends React.Component<Props, State> {
 
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
-    const { classes, custom} = this.props;
+    const { classes, user } = this.props;
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
+    const letterAvatar = (initials: string) => (<Avatar className={classes.avatar}>{initials}</Avatar>)
+    const imageAvatar = (user: IUser) => (<Avatar alt={user.name} src={user.imageBase64} className={classes.avatar} />)
+    const getUserAvatar = (user: IUser) => RIsNil(user.imageBase64) ? letterAvatar(user.initials) : imageAvatar(user);
+    const account = (user: IUser) => (
+      <div className={classes.sectionDesktop}>
+      <IconButton color="inherit">
+        <Badge badgeContent={user.emailsCount} color="secondary">
+          <MailIcon />
+        </Badge>
+      </IconButton>
+      <IconButton color="inherit">
+        <Badge badgeContent={user.notificationsCount} color="secondary">
+          <NotificationsIcon />
+        </Badge>
+      </IconButton>
+      <IconButton
+      aria-owns={isMenuOpen ? 'material-appbar' : undefined}
+      aria-haspopup="true"
+      onClick={this.handleProfileMenuOpen}
+      color="inherit"
+    >
+      {getUserAvatar(user)}
+    </IconButton>
+            </div>
+    );
+    const logInBtn = (
+      <Button color="inherit">Login</Button>
+    )
+    const profileSection = RIsNil(user) ?  logInBtn : account(user); 
     const renderMenu = (
       <Menu
         anchorEl={anchorEl}
@@ -108,11 +150,10 @@ class Header extends React.Component<Props, State> {
         onClose={this.handleMenuClose}
       >
         <MenuItem onClick={this.handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+        <MenuItem onClick={this.handleMenuClose}>Logout</MenuItem>
       </Menu>
     );
-
-    const renderMobileMenu = (
+    const mobileMenu = (
       <Menu
         anchorEl={mobileMoreAnchorEl}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -144,7 +185,7 @@ class Header extends React.Component<Props, State> {
         </MenuItem>
       </Menu>
     );
-
+    const renderMobileMenu = RIsNil(user) ?  logInBtn : mobileMenu;
     return (
       <div className={classes.root}>
         <AppBar position="static">
@@ -153,12 +194,13 @@ class Header extends React.Component<Props, State> {
               <MenuIcon />
             </IconButton>
             <Typography className={classes.title} variant="h6" color="inherit" noWrap>
-              Material-UI
+              Atlantida
             </Typography>
             <div className={classes.grow} />
-            <div className={classes.sectionDesktop}>
+            {profileSection}
+            {/* <div className={classes.sectionDesktop}>
               <IconButton color="inherit">
-                <Badge badgeContent={custom} color="secondary">
+                <Badge badgeContent={42} color="secondary">
                   <MailIcon />
                 </Badge>
               </IconButton>
@@ -175,7 +217,7 @@ class Header extends React.Component<Props, State> {
               >
                 <AccountCircle />
               </IconButton>
-            </div>
+            </div> */}
             <div className={classes.sectionMobile}>
               <IconButton aria-haspopup="true" onClick={this.handleMobileMenuOpen} color="inherit">
                 <MoreIcon />
